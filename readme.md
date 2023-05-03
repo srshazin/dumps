@@ -1,0 +1,2 @@
+# LeetCode Problems
+This repo contains solutions for leetcode problems. I built this repo when I was solving problems on leetcode. This repo is not created for anything professional manner. So codes may seem bit messy and not polished and sanitized. Also not well documented as well. But feel free to contribute anything here.
