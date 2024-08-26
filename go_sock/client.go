@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 )
+
 func sock_client() {
 	conn, error := net.Dial("tcp", "192.168.158.190:8000")
 	if error != nil {
@@ -33,7 +34,7 @@ func readMessages(conn net.Conn) {
 		message, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Println("Connection closed by the server")
-			return
+			os.Exit(1)
 		}
 		fmt.Printf("<%v>: %v", conn.RemoteAddr(), message)
 	}

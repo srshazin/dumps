@@ -8,10 +8,9 @@ import (
 	"strings"
 )
 
-
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
-	fmt.Printf("New client <%v> Connected!\n", conn.RemoteAddr())
+	fmt.Printf("New client <%v> Connected! Total clients: %v\n", len(clients), conn.RemoteAddr())
 	// Store the client to the clients map
 	mu.Lock()
 	clients[conn] = true
@@ -45,7 +44,7 @@ func broadCastMessage(message string, conn net.Conn) {
 
 		// send the message to the client
 		if conn != client {
-			_, error := fmt.Fprintln(client, strings.Trim(message, "\n"))
+			_, error := fmt.Fprintln(conn, strings.Trim(message, "\n"))
 			if error != nil {
 				fmt.Printf("Error sending message to client: %v\n", error)
 			}
