@@ -2,22 +2,26 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
-	"strings"
 )
 
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
-	fmt.Printf("New client <%v> Connected! Total clients: %v\n", len(clients), conn.RemoteAddr())
+
 	// Store the client to the clients map
 	mu.Lock()
 	clients[conn] = true
 	mu.Unlock()
-
+	fmt.Printf("New client <%v> Connected! Total clients: %v\n", conn.RemoteAddr(), len(clients))
 	reader := bufio.NewReader(conn)
-
+	welcomeMessageByte, _ := json.Marshal(Message{
+		Message: "Connection established!\n",
+		Sender:  "Admin",
+	})
+	conn.Write(append(welcomeMessageByte, '\n'))
 	for {
 		message, error := reader.ReadString('\n')
 
@@ -44,7 +48,12 @@ func broadCastMessage(message string, conn net.Conn) {
 
 		// send the message to the client
 		if conn != client {
-			_, error := fmt.Fprintln(conn, strings.Trim(message, "\n"))
+			jsonByte, _ := json.Marshal(Message{
+				Message: message,
+				Sender:  conn.RemoteAddr().String(),
+			})
+
+			_, error := client.Write(append(jsonByte, '\n'))
 			if error != nil {
 				fmt.Printf("Error sending message to client: %v\n", error)
 			}
