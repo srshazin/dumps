@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"os/exec"
 	"sync"
 
 	"github.com/hajimehoshi/go-mp3"
@@ -22,9 +23,21 @@ type Message struct {
 func clearLine() {
 	fmt.Print("\033[2K\r")
 }
+func isTermux() bool {
+	_, isTermux := os.LookupEnv("TERMUX_VERSION")
+	return isTermux
+}
 
 func playMP3() error {
 	var filePath = "top.mp3"
+	if isTermux() {
+		cmd := exec.Command("termux-media-player", "play", filePath)
+		err := cmd.Run()
+		if err != nil {
+			return fmt.Errorf("failed to play MP3: %v", err)
+		}
+		return nil
+	}
 	// Open the MP3 file
 	file, err := os.Open(filePath)
 	if err != nil {
